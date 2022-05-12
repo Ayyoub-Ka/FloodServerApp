@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <meta id="locs" data-name="{{locations}}" ">
+  <script>
+    L_NO_TOUCH = false;
+    L_DISABLE_3D = false;
+  </script>
+
+  <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+  
+    <script src=" https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js">
+    </script>
+    
+    <script
+    src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <!-- <script
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script> -->
+  <!-- <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/"></script> -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css" />
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+    crossorigin="anonymous">
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"></script>
+
+
+
+  <!-- <link rel="stylesheet"
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+  <link rel="stylesheet"
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css" /> -->
+  <link rel="stylesheet"
+    href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css" />
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css" />
+  <!-- markercluster  -->
+  <link rel="stylesheet"
+    href="{{ url_for('static', filename='dist/MarkerCluster.css')}}" />
+  <link rel="stylesheet"
+    href="{{ url_for('static', filename='dist/MarkerCluster.Default.css')}}" />
+  <script
+    src="{{ url_for('static', filename='dist/leaflet.markercluster-src.js')}}"></script>
+  
+  <style>
+    #map {
+      margin: 5% 3% 3% 0;
+
+    }
+  </style>
+  <title>{% if title%} {{title}} {% else %} Flood Map {%endif%}</title>
+</head>
+
+<body>
+  <a href="{{url_for('modal')}}" class=">popup</a>
+  <h1>Hi it new maps</h1>
+  <div class="folium-map" id='map'></div>
+  {% for location in locations %}
+  <p>{{location.lat}}</p>
+  {% endfor %}
+  
+  <!-- {% block modal%}
+  {% endblock %} -->
+ 
+  <script>
+    var stations = {{ locations| safe }}
+    //'{{locations }}';
+
+  </script>
+ 
+</body>
+<!-- {% block  script %}
+
+{% endblock %} -->
+<script>
+
+  var map = L.map(
+    "map",
+    {
+      center: [51.509865, -0.118092],
+      crs: L.CRS.EPSG3857,
+      zoom: 7,
+      zoomControl: true,
+      preferCanvas: true,
+    }
+  );
+  L.control.scale().addTo(map);
+  var tile_layer_0ce38799af920ee56124f71186b562eb = L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    { "attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false }
+  ).addTo(map);
+
+  var markers = L.markerClusterGroup();
+
+  for (const station of stations) {
+    marker = L.marker([station.lat, station.long]);
+    marker.bindPopup(station.notation).bindTooltip(station.notation).on('click', function (e) {
+
+      $.ajax({
+        url: "/",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(this.getTooltip().getContent())
+      });
+    });
+    //marker.on('click', onClick(e));
+    markers.addLayer(marker);
+  }
+  map.addLayer(markers);
+
+</script>
+
+<script type="text/javascript ">
+    var someJavaScriptVar = '{{ locations[1] }}';
+    function test_func(data) {
+        return data
+    }
+</script>
