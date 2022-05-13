@@ -22,7 +22,7 @@ stations=[]
 def home():
     stations = getDataX()
     locations = getLocations(stations)
-    return render_template("index.html", title="Map", locations=json.dumps(locations))
+    return render_template("index.html", title="Real Time flood-monitoring", locations=json.dumps(locations))
 
 
 @app.route('/', methods=['POST'])
