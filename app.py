@@ -19,29 +19,31 @@ app = Flask(__name__)
 api_root = "http://environment.data.gov.uk/flood-monitoring";
 
 locations =[];
-
-@app.route("/")
+stations=[]
+@app.route("/" )
 def home():
     stations = getDataX()
     locations = getLocations(stations)
     return render_template("index.html", title="Map", locations=json.dumps(locations))
 
-@app.route('/modal')
-def modal():
-    return render_template("modal.html", locations=json.dumps(locations))
 
 @app.route('/', methods=['POST'])
 def getSelectedStation():
     output = request.get_json()
     print(output)
     #getPLot(output)
-    return redirect(url_for('/plot.png', result_id=output))
+    #return redirect(url_for('/plot.png', result_id=output))
+    res = make_response(jsonify({"message": "OK"}), 200)
+    return  redirect(url_for('/plot.png', result_id=output))
 
 
 
 
 def getDataX():
-    
+    # if (stations or stations!=[]) :
+    #     print('data existe')
+    #     return
+    # print('getting data')
     response = requests.get(api_root+"/id/stations")
     stations_Data = response.json()
     stations_List = json_normalize(stations_Data, 'items')
