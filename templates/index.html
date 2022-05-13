@@ -84,8 +84,10 @@
 
   for (const station of stations) {
     marker = L.marker([station.lat, station.long]);
-    marker.bindPopup('<h1>Mark</h1>').bindTooltip(station.notation).on('click', function (e) {
-
+    // viga imbded was
+    marker.bindPopup('<div id="vis"></div>',maxWidth=800, maxHeight=500).bindTooltip(station.notation).on('click', function (e) {
+     // '<div id="altair-timeseries"></div></div><!-- Placeholder for the tooltip --><div id="vis-tooltip" class="vg-tooltip"></div>' 
+    //</div>
     /*$.ajax({
         url: "/",
         type: "POST",
@@ -107,9 +109,12 @@
             return;
           }
           response.json().then(function (data) {
-            var popup = e.target.getPopup();
+                
             console.log(data)
-            
+            var vega_spec = data
+            var embedOpt = {"mode": "vega-lite"};
+            //var options = {"renderer": "canvas", "actions": false};
+            vegaEmbed("#vis", vega_spec, embedOpt)
             //popup.setContent( data );
           });
         })
@@ -129,3 +134,4 @@
   map.addLayer(markers);
 
 </script>
+

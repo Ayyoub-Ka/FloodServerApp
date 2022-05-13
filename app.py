@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for ,Response,make_response
+from flask import Flask, render_template, Response,make_response
 from flask import request,jsonify
 from requests import post
 import requests
@@ -9,10 +9,8 @@ import vincent
 import random
 import io
 import json
-import mpld3
-from mpld3 import plugins
-from matplotlib import pyplot as plt
-import base64
+import altair as alt
+
 
 app = Flask(__name__)
 
@@ -29,12 +27,11 @@ def home():
 
 @app.route('/', methods=['POST'])
 def getSelectedStation():
-    output = request.get_json()
-    print(output)
-    code=getHtmlPlot(output)
+    station_id = request.get_json()
+    #code=getPlot(output)
     #return redirect(url_for('/plot.png', result_id=output))
     #return  make_response(jsonify(plot_png(1)), 200)
-    return  make_response(plot_png64(), 200)
+    return  make_response(getAltiarChar(station_id), 200)
 
 def getDataX():
     # if (stations or stations!=[]) :
@@ -62,7 +59,7 @@ def getPlot(id):
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-def preparePlot(id):
+def prepareDateForPlot(id):
     if id=='':
         return 
 
@@ -88,8 +85,7 @@ def preparePlot(id):
     #parameter=sm.loc[sm['@id'] == 30000, 'parameterName'].iloc[0]
     #df['measure']=df['measure'].map(lambda m: m[m.rfind('/'):] ).map(lambda m: m[m.find('-')+1:])
     df['measure']=df['measure'].map(lambda m:sm.loc[sm['@id'] == m, ['parameterName','qualifier']].iloc[0].str.cat(sep='-'))
-    x=df.pivot(index='dateTime', columns='measure', values='value').reset_index()
-    return df, x
+    return df
 
 def create_figure():
     fig = Figure()
@@ -106,23 +102,21 @@ def plot_png(result_id):
     return Response(output.getvalue(), mimetype='image/png')
 
 
+def getAltiarChar(station_id):
+    df= prepareDateForPlot(station_id)
+    pl=alt.Chart(df).mark_line().encode(
+    x='dateTime',
+    y='value',
+    color='measure',
+    strokeDash='measure')
+    pl.properties(width=200, height=150)
+    return pl.to_json()
 
-def plot_png64():
-    my_stringIObytes = io.BytesIO()
-    create_figure().savefig(my_stringIObytes, format='jpg')
-    my_stringIObytes.seek(0)
-    my_base64_jpgData = base64.b64encode(my_stringIObytes.read())
-    return my_base64_jpgData
 
-def getHtmlPlot(id):
-    _,x =preparePlot(id)
-    fig= plt.figure()
-    #ax = fig.add_subplot(1,1,1)
-    ax=x.plot(x='dateTime', fontsize=15)
-    # Additional customizations
-    ax.set_xlabel('Date')
-    ax.legend(fontsize=14)
-    return mpld3.fig_to_html(fig)
+
+
+
+
 
 
 
