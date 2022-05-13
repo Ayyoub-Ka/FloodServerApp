@@ -33,7 +33,9 @@
     href="{{ url_for('static', filename='dist/MarkerCluster.Default.css')}}" />
   <script
     src="{{ url_for('static', filename='dist/leaflet.markercluster-src.js')}}"></script>
-  
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
   <style>
     #map {
       margin: 5% 3% 3% 0;
@@ -82,14 +84,39 @@
 
   for (const station of stations) {
     marker = L.marker([station.lat, station.long]);
-    marker.bindPopup(station.notation).bindTooltip(station.notation).on('click', function (e) {
+    marker.bindPopup('<h1>Mark</h1>').bindTooltip(station.notation).on('click', function (e) {
 
-     $.ajax({
+    /*$.ajax({
         url: "/",
         type: "POST",
         contentType: "application/json",
         data: JSON.stringify(this.getTooltip().getContent())
-      });
+      });*/
+      fetch(`${window.origin}`, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify(this.getTooltip().getContent()),
+        cache: "no-cache",
+        headers: new Headers({
+          "content-type": "application/json"
+        })
+      })
+        .then(function (response) {
+          if (response.status !== 200) {
+            console.log(`Looks like there was a problem. Status code: ${response.status}`);
+            return;
+          }
+          response.json().then(function (data) {
+            var popup = e.target.getPopup();
+            console.log(data)
+            
+            //popup.setContent( data );
+          });
+        })
+        .catch(function (error) {
+          console.log("Fetch error: " + error);
+        });
+
     });
 
    
@@ -102,4 +129,3 @@
   map.addLayer(markers);
 
 </script>
-
