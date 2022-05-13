@@ -1,11 +1,10 @@
 from flask import Flask, render_template, Response,make_response
-from flask import request,jsonify
+from flask import request
 from requests import post
 import requests
 import pandas as pd
 from pandas import json_normalize
 from datetime import datetime, timedelta
-import vincent
 import random
 import io
 import json
