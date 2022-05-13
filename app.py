@@ -28,9 +28,6 @@ def home():
 @app.route('/', methods=['POST'])
 def getSelectedStation():
     station_id = request.get_json()
-    #code=getPlot(output)
-    #return redirect(url_for('/plot.png', result_id=output))
-    #return  make_response(jsonify(plot_png(1)), 200)
     return  make_response(getAltiarChar(station_id), 200)
 
 def getDataX():
@@ -49,15 +46,6 @@ def getLocations(stations):
         'lat', 'long', 'notation']].notnull().all(1)]
     return filtered_stations[['lat', 'long', 'notation']].to_dict("records")
 
-def getPlot(id):
-    df ,_= preparePlot(id)
-    line = vincent.Line(df)
-    line.axis_titles(x='dateTime', y='value')
-    line.legend(title='Categories')
-    return line.to_json()
-
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
 
 def prepareDateForPlot(id):
     if id=='':
